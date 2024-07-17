@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"envsecret/packages/util"
 	"errors"
 	"os"
 	"path/filepath"
@@ -20,9 +21,14 @@ func init() {
 }
 
 var initCmd = &cobra.Command{
-	Use:     "init",
-	Short:   "This command initializes the environment variable tracking system",
-	Example: "es init",
+	Use:                   "init",
+	Short:                 "Used to connect your local project with Envsecret project",
+	DisableFlagsInUseLine: true,
+	Example:               "es init",
+	Args:                  cobra.ExactArgs(0),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		util.RequireLogin()
+	},
 	RunE: func(_ *cobra.Command, _ []string) error {
 		return runInitCommand()
 	},

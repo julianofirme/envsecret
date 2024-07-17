@@ -1,0 +1,37 @@
+package util
+
+const (
+	CONFIG_FILE_NAME                           = "env-config.json"
+	CONFIG_FOLDER_NAME                         = ".envsecret"
+	ENVSECRET_DEFAULT_API_URL                  = "https://app.envsecret.com/api"
+	ENVSECRET_DEFAULT_URL                      = "https://app.envsecret.com"
+	ENVSECRET_WORKSPACE_CONFIG_FILE_NAME       = ".envsecret.json"
+	ENVSECRET_TOKEN_NAME                       = "ENVSECRET_TOKEN"
+	ENVSECRET_UNIVERSAL_AUTH_ACCESS_TOKEN_NAME = "ENVSECRET_UNIVERSAL_AUTH_ACCESS_TOKEN"
+
+	// Universal Auth
+	ENVSECRET_UNIVERSAL_AUTH_CLIENT_ID_NAME     = "ENVSECRET_UNIVERSAL_AUTH_CLIENT_ID"
+	ENVSECRET_UNIVERSAL_AUTH_CLIENT_SECRET_NAME = "ENVSECRET_UNIVERSAL_AUTH_CLIENT_SECRET"
+
+	// Kubernetes auth
+	ENVSECRET_KUBERNETES_SERVICE_ACCOUNT_TOKEN_NAME = "ENVSECRET_KUBERNETES_SERVICE_ACCOUNT_TOKEN_PATH"
+
+	// GCP Auth
+	ENVSECRET_GCP_IAM_SERVICE_ACCOUNT_KEY_FILE_PATH_NAME = "ENVSECRET_GCP_IAM_SERVICE_ACCOUNT_KEY_FILE_PATH"
+
+	// Generic env variable used for auth methods that require a machine identity ID
+	ENVSECRET_MACHINE_IDENTITY_ID_NAME = "ENVSECRET_MACHINE_IDENTITY_ID"
+
+	SECRET_TYPE_PERSONAL      = "personal"
+	SECRET_TYPE_SHARED        = "shared"
+	KEYRING_SERVICE_NAME      = "envsecret"
+	PERSONAL_SECRET_TYPE_NAME = "personal"
+	SHARED_SECRET_TYPE_NAME   = "shared"
+
+	SERVICE_TOKEN_IDENTIFIER        = "service-token"
+	UNIVERSAL_AUTH_TOKEN_IDENTIFIER = "universal-auth-token"
+)
+
+var (
+	CLI_VERSION = "devel"
+)

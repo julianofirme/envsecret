@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"envsecret/packages/util"
 	"fmt"
 	"os"
 	"strings"
@@ -23,6 +24,9 @@ var addCmd = &cobra.Command{
 	Use:     "add",
 	Aliases: []string{"a"},
 	Short:   "This command will track changes in your .env file",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		util.RequireLogin()
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runAddCommand(stagingAreaFilePath, args)
 	},

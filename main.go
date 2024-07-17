@@ -1,7 +1,7 @@
 package main
 
 import (
-	"envsecret/cmd"
+	"envsecret/packages/cmd"
 )
 
 func main() {
