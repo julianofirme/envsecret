@@ -96,7 +96,7 @@ func CallSelectOrganization(httpClient *resty.Client, request SelectOrganization
 		SetBody(request).
 		SetResult(&selectOrgResponse).
 		SetHeader("User-Agent", USER_AGENT).
-		Post(fmt.Sprintf("%v/api/select-organization", ENVSECRET_URL))
+		Post(fmt.Sprintf("%v/api/organization/select", ENVSECRET_URL))
 
 	if err != nil {
 		return SelectOrganizationResponse{}, err
