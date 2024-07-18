@@ -1,13 +1,11 @@
 package models
 
 type UserCredentials struct {
-	Email        string `json:"email"`
-	PrivateKey   string `json:"privateKey"`
-	JTWToken     string `json:"JTWToken"`
-	RefreshToken string `json:"RefreshToken"`
+	Email    string `json:"email"`
+	JWTToken string `json:"JWTToken"`
 }
 
-// The file struct for Infisical config file
+// The file struct for Envsecret config file
 type ConfigFile struct {
 	LoggedInUserEmail  string         `json:"loggedInUserEmail"`
 	LoggedInUserDomain string         `json:"LoggedInUserDomain,omitempty"`

@@ -3,9 +3,11 @@ package util
 import (
 	"encoding/json"
 	"envsecret/packages/models"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 func GetFullConfigFilePath() (fullPathToFile string, fullPathToDirectory string, err error) {
@@ -43,31 +45,61 @@ func GetConfigFile() (models.ConfigFile, error) {
 	return configFile, nil
 }
 
-const (
-	tokenFile           = "token.txt"
-	selectedProjectFile = "selected_project.txt"
-)
-
-func SaveToken(token string) error {
-	return ioutil.WriteFile(tokenFile, []byte(token), 0644)
-}
-
-func LoadToken() (string, error) {
-	data, err := ioutil.ReadFile(tokenFile)
+func ConfigFileExists() bool {
+	fullConfigFileURI, _, err := GetFullConfigFilePath()
 	if err != nil {
-		return "", err
+		log.Debug().Err(err).Msgf("There was an error when creating the full path to config file")
+		return false
 	}
-	return string(data), nil
+
+	if _, err := os.Stat(fullConfigFileURI); err == nil {
+		return true
+	} else {
+		return false
+	}
 }
 
-func SaveSelectedProject(projectId string) error {
-	return ioutil.WriteFile(selectedProjectFile, []byte(projectId), 0644)
+func WorkspaceConfigFileExistsInCurrentPath() bool {
+	if _, err := os.Stat(ENVSECRET_WORKSPACE_CONFIG_FILE_NAME); err == nil {
+		return true
+	} else {
+		log.Debug().Err(err)
+		return false
+	}
 }
 
-func LoadSelectedProject() (string, error) {
-	data, err := ioutil.ReadFile(selectedProjectFile)
+func WriteConfigFile(configFile *models.ConfigFile) error {
+	fullConfigFilePath, fullConfigFileDirPath, err := GetFullConfigFilePath()
 	if err != nil {
-		return "", err
+		return fmt.Errorf("writeConfigFile: unable to write config file because an error occurred when getting config file path [err=%s]", err)
 	}
-	return string(data), nil
+
+	configFileMarshalled, err := json.Marshal(configFile)
+	if err != nil {
+		return fmt.Errorf("writeConfigFile: unable to write config file because an error occurred when marshalling the config file [err=%s]", err)
+	}
+
+	// check if config folder exists and if not create it
+	if _, err := os.Stat(fullConfigFileDirPath); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(fullConfigFileDirPath, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Create file in directory
+	err = os.WriteFile(fullConfigFilePath, configFileMarshalled, 0600)
+	if err != nil {
+		return fmt.Errorf("writeConfigFile: Unable to write to file [err=%s]", err)
+	}
+
+	if err != nil {
+		return fmt.Errorf("writeConfigFile: unable to write config file because an error occurred when write the config to file [err=%s]", err)
+
+	}
+
+	return nil
 }
+
+var ENVSECRET_URL_MANUAL_OVERRIDE string
+var ENVSECRET_LOGIN_URL string
