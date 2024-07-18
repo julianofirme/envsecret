@@ -24,13 +24,18 @@ type GetOrganizationsResponse struct {
 const USER_AGENT = "cli"
 const ENVSECRET_URL = "http://localhost:3000"
 
-type Project struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+type GetWorkSpacesResponse struct {
+	Workspaces []struct {
+		ID             string `json:"id"`
+		Name           string `json:"name"`
+		Description    string `json:"description"`
+		Slug           string `json:"slug"`
+		AvatarUrl      string `json:"avatar_url"`
+		CreatedAt      string `json:"created_at"`
+		UpdatedAt      string `json:"updated_at"`
+		OwnerId        string `json:"ownerId"`
+		OrganizationId string `json:"organization_id"`
+	} `json:"projects"`
 }
 
 type SelectOrganizationRequest struct {
@@ -108,4 +113,23 @@ func CallSelectOrganization(httpClient *resty.Client, request SelectOrganization
 
 	return selectOrgResponse, nil
 
+}
+
+func CallGetAllWorkSpacesUserBelongsTo(httpClient *resty.Client, orgId string) (GetWorkSpacesResponse, error) {
+	var workSpacesResponse GetWorkSpacesResponse
+	response, err := httpClient.
+		R().
+		SetResult(&workSpacesResponse).
+		SetHeader("User-Agent", USER_AGENT).
+		Get(fmt.Sprintf("%v/api/project/%s", ENVSECRET_URL, orgId))
+
+	if err != nil {
+		return GetWorkSpacesResponse{}, err
+	}
+
+	if response.IsError() {
+		return GetWorkSpacesResponse{}, fmt.Errorf("CallGetAllWorkSpacesUserBelongsTo: Unsuccessful response:  [response=%v]", response)
+	}
+
+	return workSpacesResponse, nil
 }

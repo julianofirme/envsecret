@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"envsecret/packages/api"
+	"envsecret/packages/models"
 	"envsecret/packages/util"
 	"fmt"
 	"os"
@@ -90,7 +92,52 @@ var initCmd = &cobra.Command{
 		userCreds.UserCredentials.JWTToken = tokenResponse.Token
 		err = util.StoreUserCredsInKeyRing(&userCreds.UserCredentials)
 		httpClient.SetAuthToken(tokenResponse.Token)
+
+		if err != nil {
+			util.HandleError(err, "Unable to store your user credentials")
+		}
+
+		workspaceResponse, err := api.CallGetAllWorkSpacesUserBelongsTo(httpClient, selectedOrganization.ID)
+		if err != nil {
+			util.HandleError(err, "Unable to pull projects that belong to you")
+		}
+
+		filteredWorkspaces, workspaceNames := GetWorkspacesInOrganization(workspaceResponse, selectedOrganization.ID)
+
+		prompt = promptui.Select{
+			Label: "Which of your Infisical projects would you like to connect this project to?",
+			Items: workspaceNames,
+			Size:  7,
+		}
+
+		index, _, err = prompt.Run()
+		if err != nil {
+			util.HandleError(err)
+		}
+
+		err = writeWorkspaceFile(filteredWorkspaces[index])
+		if err != nil {
+			util.HandleError(err)
+		}
 	},
+}
+
+func writeWorkspaceFile(selectedWorkspace models.Workspace) error {
+	workspaceFileToSave := models.WorkspaceConfigFile{
+		WorkspaceId: selectedWorkspace.ID,
+	}
+
+	marshalledWorkspaceFile, err := json.MarshalIndent(workspaceFileToSave, "", "    ")
+	if err != nil {
+		return err
+	}
+
+	err = util.WriteToFile(util.ENVSECRET_WORKSPACE_CONFIG_FILE_NAME, marshalledWorkspaceFile, 0600)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func checkPathExists(path string) (bool, error) {
@@ -142,4 +189,25 @@ func GetOrganizationsNameList(organizationResponse api.GetOrganizationsResponse)
 	}
 
 	return organizationNames
+}
+
+func GetWorkspacesInOrganization(workspaceResponse api.GetWorkSpacesResponse, orgId string) ([]models.Workspace, []string) {
+	workspaces := workspaceResponse.Workspaces
+
+	var filteredWorkspaces []models.Workspace
+	var workspaceNames []string
+
+	for _, workspace := range workspaces {
+		if workspace.OrganizationId == orgId {
+			filteredWorkspaces = append(filteredWorkspaces, workspace)
+			workspaceNames = append(workspaceNames, workspace.Name)
+		}
+	}
+
+	if len(filteredWorkspaces) == 0 {
+		message := fmt.Sprintf("You don't have any projects created in Envsecret organization. You must first create a project at %s", util.ENVSECRET_DEFAULT_URL)
+		util.PrintErrorMessageAndExit(message)
+	}
+
+	return filteredWorkspaces, workspaceNames
 }
