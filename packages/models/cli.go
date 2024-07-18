@@ -8,6 +8,7 @@ type UserCredentials struct {
 // The file struct for Envsecret config file
 type ConfigFile struct {
 	LoggedInUserEmail  string         `json:"loggedInUserEmail"`
+	LoggedInUserToken  string         `json:"loggedInUserToken"`
 	LoggedInUserDomain string         `json:"LoggedInUserDomain,omitempty"`
 	LoggedInUsers      []LoggedInUser `json:"loggedInUsers,omitempty"`
 	VaultBackendType   string         `json:"vaultBackendType,omitempty"`

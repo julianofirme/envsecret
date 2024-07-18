@@ -39,6 +39,19 @@ var LoginCmd = &cobra.Command{
 
 		err = util.StoreUserCredsInKeyRing(&userCredentialsToBeStored)
 		if err != nil {
+			util.HandleError(err, "[envsecret user update domain]: Unable to store credentials")
+		}
+
+		configFile, err := util.GetConfigFile()
+		if err != nil {
+			util.HandleError(err, "[envsecret user update domain]: Unable to get config file")
+		}
+
+		configFile.LoggedInUserEmail = email
+		configFile.LoggedInUserToken = token
+
+		err = util.WriteConfigFile(&configFile)
+		if err != nil {
 			log.Error().Msgf("Unable to store your credentials in system vault")
 			log.Debug().Err(err)
 			//return here
