@@ -1,0 +1,9 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.env
+.local.env
+.envsecret.json
+dist/
