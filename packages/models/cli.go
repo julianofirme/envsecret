@@ -35,3 +35,22 @@ type Workspace struct {
 	OwnerId        string `json:"ownerId"`
 	OrganizationId string `json:"organization_id"`
 }
+
+type Secret struct {
+	ID             string `json:"id"`
+	Version        int    `json:"version"`
+	KeyEncrypted   string `json:"key_encrypted"`
+	KeyIV          string `json:"key_iv"`
+	KeyAuthTag     string `json:"key_auth_tag"`
+	ValueEncrypted string `json:"value_encrypted"`
+	ValueIV        string `json:"value_iv"`
+	ValueAuthTag   string `json:"value_auth_tag"`
+	Algorithm      string `json:"algorithm"`
+	KeyEncoding    string `json:"key_encoding"`
+	ProjectID      string `json:"project_id"`
+	UserID         string `json:"user_id"`
+	CreatedAt      string `json:"created_at"`
+	UpdatedAt      string `json:"updated_at"`
+	Key            string `json:"key"`
+	Value          string `json:"value"`
+}
