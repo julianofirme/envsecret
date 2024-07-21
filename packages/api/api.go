@@ -38,6 +38,28 @@ type GetWorkSpacesResponse struct {
 	} `json:"projects"`
 }
 
+type GetSecretsResponse struct {
+	Secret []struct {
+		ID             string `json:"id"`
+		Version        int    `json:"version"`
+		KeyEncrypted   string `json:"key_encrypted"`
+		KeyIV          string `json:"key_iv"`
+		KeyAuthTag     string `json:"key_auth_tag"`
+		ValueEncrypted string `json:"value_encrypted"`
+		ValueIV        string `json:"value_iv"`
+		ValueAuthTag   string `json:"value_auth_tag"`
+		Algorithm      string `json:"algorithm"`
+		KeyEncoding    string `json:"key_encoding"`
+		ProjectID      string `json:"project_id"`
+		UserID         string `json:"user_id"`
+		CreatedAt      string `json:"created_at"`
+		UpdatedAt      string `json:"updated_at"`
+		Key            string `json:"key"`
+		Value          string `json:"value"`
+		Env            string `json:"env"`
+	} `json:"secrets"`
+}
+
 type SelectOrganizationRequest struct {
 	OrganizationId string `json:"organizationId"`
 }
@@ -132,4 +154,23 @@ func CallGetAllWorkSpacesUserBelongsTo(httpClient *resty.Client, orgId string) (
 	}
 
 	return workSpacesResponse, nil
+}
+
+func CallGetSecrets(httpClient *resty.Client, workspaceId string) (GetSecretsResponse, error) {
+	var secretsResponse GetSecretsResponse
+	response, err := httpClient.
+		R().
+		SetResult(&secretsResponse).
+		SetHeader("User-Agent", USER_AGENT).
+		Get(fmt.Sprintf("%v/api/secret/%s", ENVSECRET_URL, workspaceId))
+
+	if err != nil {
+		return GetSecretsResponse{}, err
+	}
+
+	if response.IsError() {
+		return GetSecretsResponse{}, fmt.Errorf("CallGetSecrets: Unsuccessful response:  [response=%v]", response)
+	}
+
+	return secretsResponse, nil
 }

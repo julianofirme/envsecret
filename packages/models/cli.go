@@ -53,4 +53,5 @@ type Secret struct {
 	UpdatedAt      string `json:"updated_at"`
 	Key            string `json:"key"`
 	Value          string `json:"value"`
+	Env            string `json:"env"`
 }

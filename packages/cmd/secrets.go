@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"encoding/json"
+	"envsecret/packages/api"
 	"envsecret/packages/models"
+	"envsecret/packages/util"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,17 +29,20 @@ var pullCmd = &cobra.Command{
 			return
 		}
 
-		client := resty.New()
-		resp, err := client.R().
-			SetPathParam("projectId", config.WorkspaceId).
-			Get("http://localhost:3000/api/secret/{projectId}")
+		userCreds, err := util.GetCurrentLoggedInUserDetails()
 		if err != nil {
-			fmt.Println("Error fetching secrets:", err)
-			return
+			util.HandleError(err, "Unable to get your login details")
 		}
 
-		var secrets []models.Secret
-		err = json.Unmarshal(resp.Body(), &secrets)
+		if userCreds.LoginExpired {
+			util.PrintErrorMessageAndExit("Your login session has expired, please run [envsecret login] and try again")
+		}
+
+		httpClient := resty.New()
+		httpClient.SetAuthToken(userCreds.UserCredentials.JWTToken)
+
+		secrets, err := api.CallGetSecrets(httpClient, config.WorkspaceId)
+
 		if err != nil {
 			fmt.Println("Error parsing secrets:", err)
 			return
@@ -50,7 +55,7 @@ var pullCmd = &cobra.Command{
 		}
 		defer file.Close()
 
-		for _, secret := range secrets {
+		for _, secret := range secrets.Secret {
 			_, err := file.WriteString(fmt.Sprintf("%s=%s\n", secret.Key, secret.Value))
 			if err != nil {
 				fmt.Println("Error writing to .env file:", err)
