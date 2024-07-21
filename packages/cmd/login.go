@@ -126,7 +126,7 @@ func GetJwtTokenWithOrganizationId(oldJwtToken string) string {
 	organizationNames := GetOrganizationsNameList(organizationResponse)
 
 	prompt := promptui.Select{
-		Label: "Which Infisical organization would you like to log into?",
+		Label: "Which Envsecret organization would you like to log into?",
 		Items: organizationNames,
 	}
 

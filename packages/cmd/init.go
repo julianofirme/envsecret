@@ -105,7 +105,7 @@ var initCmd = &cobra.Command{
 		filteredWorkspaces, workspaceNames := GetWorkspacesInOrganization(workspaceResponse, selectedOrganization.ID)
 
 		prompt = promptui.Select{
-			Label: "Which of your Infisical projects would you like to connect this project to?",
+			Label: "Which of your Envsecret projects would you like to connect this project to?",
 			Items: workspaceNames,
 			Size:  7,
 		}
