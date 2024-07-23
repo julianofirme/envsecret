@@ -31,6 +31,7 @@ type GetWorkSpacesResponse struct {
 		Description    string `json:"description"`
 		Slug           string `json:"slug"`
 		AvatarUrl      string `json:"avatar_url"`
+		SecretKey      string `json:"secret_key"`
 		CreatedAt      string `json:"created_at"`
 		UpdatedAt      string `json:"updated_at"`
 		OwnerId        string `json:"ownerId"`

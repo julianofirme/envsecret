@@ -25,15 +25,16 @@ var runCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		encryptionKey := string(os.Getenv("SECRET_ENCRYPTION_KEY"))
-		if len(encryptionKey) == 0 {
-			fmt.Println("SECRET_ENCRYPTION_KEY environment variable is required")
-			return
-		}
 
 		config, err := loadConfig(".envsecret.json")
 		if err != nil {
 			fmt.Println("Error loading config:", err)
+			return
+		}
+
+		encryptionKey := config.WorkspaceSecretKey
+		if len(encryptionKey) == 0 {
+			fmt.Println("encryptionKey is required")
 			return
 		}
 

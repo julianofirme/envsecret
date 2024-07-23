@@ -21,6 +21,7 @@ type LoggedInUser struct {
 
 type WorkspaceConfigFile struct {
 	WorkspaceId                   string            `json:"workspaceId"`
+	WorkspaceSecretKey            string            `json:"workspaceSecretKey"`
 	DefaultEnvironment            string            `json:"defaultEnvironment"`
 	GitBranchToEnvironmentMapping map[string]string `json:"gitBranchToEnvironmentMapping"`
 }
@@ -30,6 +31,7 @@ type Workspace struct {
 	Description    string `json:"description"`
 	Slug           string `json:"slug"`
 	AvatarUrl      string `json:"avatar_url"`
+	SecretKey      string `json:"secret_key"`
 	CreatedAt      string `json:"created_at"`
 	UpdatedAt      string `json:"updated_at"`
 	OwnerId        string `json:"ownerId"`

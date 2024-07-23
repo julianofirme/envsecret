@@ -124,7 +124,8 @@ var initCmd = &cobra.Command{
 
 func writeWorkspaceFile(selectedWorkspace models.Workspace) error {
 	workspaceFileToSave := models.WorkspaceConfigFile{
-		WorkspaceId: selectedWorkspace.ID,
+		WorkspaceId:        selectedWorkspace.ID,
+		WorkspaceSecretKey: selectedWorkspace.SecretKey,
 	}
 
 	marshalledWorkspaceFile, err := json.MarshalIndent(workspaceFileToSave, "", "    ")
