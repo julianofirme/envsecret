@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/base64"
 	"envsecret/packages/api"
 	"envsecret/packages/util"
 	"fmt"
@@ -24,6 +25,12 @@ var runCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		encryptionKey := string(os.Getenv("SECRET_ENCRYPTION_KEY"))
+		if len(encryptionKey) == 0 {
+			fmt.Println("SECRET_ENCRYPTION_KEY environment variable is required")
+			return
+		}
+
 		config, err := loadConfig(".envsecret.json")
 		if err != nil {
 			fmt.Println("Error loading config:", err)
@@ -44,21 +51,67 @@ var runCmd = &cobra.Command{
 
 		secrets, err := api.CallGetSecrets(httpClient, config.WorkspaceId)
 		if err != nil {
-			fmt.Println("Error parsing secrets:", err)
+			fmt.Println("Error loading secrets file:", err)
 			return
 		}
 
 		envVars := make(map[string]string)
+		for _, secret := range secrets.Secret {
+			// decrypt env key
+			key_iv, err := base64.StdEncoding.DecodeString(secret.KeyIV)
+			if err != nil {
+				fmt.Println("unable to decode secret IV for secret key", err)
+			}
 
+			key_tag, err := base64.StdEncoding.DecodeString(secret.KeyAuthTag)
+			if err != nil {
+				fmt.Println("unable to decode secret authentication tag for secret key", err)
+			}
+
+			key_ciphertext, err := base64.StdEncoding.DecodeString(secret.KeyEncrypted)
+			if err != nil {
+				fmt.Println("unable to decode secret cipher text for secret key", err)
+			}
+
+			decryptedKey, err := util.DecryptSymmetric([]byte(encryptionKey), key_ciphertext, key_tag, key_iv)
+			if err != nil {
+				fmt.Println("Error decrypting secret key:", err)
+				return
+			}
+			decryptedKeyString := string(decryptedKey)
+
+			// decrypt env value
+			value_iv, err := base64.StdEncoding.DecodeString(secret.ValueIV)
+			if err != nil {
+				fmt.Println("unable to decode secret IV for secret key", err)
+			}
+
+			value_tag, err := base64.StdEncoding.DecodeString(secret.ValueAuthTag)
+			if err != nil {
+				fmt.Println("unable to decode secret authentication tag for secret key", err)
+			}
+
+			value_ciphertext, err := base64.StdEncoding.DecodeString(secret.ValueEncrypted)
+			if err != nil {
+				fmt.Println("unable to decode secret cipher text for secret key", err)
+			}
+
+			decryptedValue, err := util.DecryptSymmetric([]byte(encryptionKey), value_ciphertext, value_tag, value_iv)
+			if err != nil {
+				fmt.Println("Error decrypting secret value:", err)
+				return
+			}
+			decryptedValueString := string(decryptedValue)
+
+			envVars[decryptedKeyString] = decryptedValueString
+		}
+
+		// merge with existing environment variables
 		for _, s := range os.Environ() {
 			kv := strings.SplitN(s, "=", 2)
 			key := kv[0]
 			value := kv[1]
 			envVars[key] = value
-		}
-
-		for _, secret := range secrets.Secret {
-			envVars[secret.Key] = secret.Value
 		}
 
 		var env []string

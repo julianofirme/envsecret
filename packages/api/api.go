@@ -54,8 +54,6 @@ type GetSecretsResponse struct {
 		UserID         string `json:"user_id"`
 		CreatedAt      string `json:"created_at"`
 		UpdatedAt      string `json:"updated_at"`
-		Key            string `json:"key"`
-		Value          string `json:"value"`
 		Env            string `json:"env"`
 	} `json:"secrets"`
 }

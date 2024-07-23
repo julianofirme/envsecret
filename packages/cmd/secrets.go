@@ -53,7 +53,7 @@ var pullCmd = &cobra.Command{
 		defer file.Close()
 
 		for _, secret := range secrets.Secret {
-			_, err := file.WriteString(fmt.Sprintf("%s=%s\n", secret.Key, secret.Value))
+			_, err := file.WriteString(fmt.Sprintf("%s=%s\n", secret.KeyEncrypted, secret.ValueEncrypted))
 			if err != nil {
 				fmt.Println("Error writing to .env file:", err)
 				return
