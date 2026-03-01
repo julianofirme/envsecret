@@ -78,7 +78,6 @@ are passed to the child.`,
 			return err
 		}
 
-		// Ponto 12: warn when vault is empty
 		if len(secrets) == 0 {
 			fmt.Fprintf(os.Stderr, "[%s] warning: vault is empty — no secrets injected\n", proj)
 		}

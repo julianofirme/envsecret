@@ -38,7 +38,7 @@ Examples:
 			return fmt.Errorf("open file: %w", err)
 		}
 		if shouldClose {
-			defer f.Close()
+			defer func() { _ = f.Close() }()
 		}
 
 		pairs, err := readEnvLines(bufio.NewReader(f))
