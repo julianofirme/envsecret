@@ -18,10 +18,10 @@ jobs:
           # macOS — native runners so cgo (go-keyring) links against Security.framework
           - goos: darwin
             goarch: amd64
-            runner: macos-13        # Intel
+            runner: macos-15-intel  # Intel
           - goos: darwin
             goarch: arm64
-            runner: macos-14        # Apple Silicon
+            runner: macos-15        # Apple Silicon
 
           # Linux amd64 — native runner; libsecret-1-dev installed below
           - goos: linux

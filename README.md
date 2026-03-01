@@ -211,7 +211,7 @@ AI coding agents typically access secrets through three vectors: files on disk, 
 
 **Files on disk.** The vault file is AES-256-GCM encrypted. Without the master key it is indistinguishable from random bytes. File permissions are `600`. The master key is in the OS keychain, never on disk.
 
-**Shell environment.** `envs run` spawns the child process with `shell: false`. Vault vars are injected directly into the child's environment via `exec.Command`. The parent shell is never modified — running `printenv` before or after sees nothing new.
+**Shell environment.** `envs run` replaces the current process with the child via `syscall.Exec`. Vault vars are injected directly into the child's environment. The parent shell is never modified — running `printenv` before or after sees nothing new.
 
 **Shell history.** There is no `export KEY=value` command to record. The secret never appears in a command you type.
 
