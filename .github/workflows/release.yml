@@ -23,13 +23,10 @@ jobs:
             goarch: arm64
             runner: macos-14        # Apple Silicon
 
-          # Linux — native runner; libsecret-1-dev installed below
+          # Linux amd64 — native runner; libsecret-1-dev installed below
           - goos: linux
             goarch: amd64
             runner: ubuntu-22.04
-          - goos: linux
-            goarch: arm64
-            runner: ubuntu-22.04    # cross-compiled via GOARCH + gcc-aarch64
 
     steps:
       - name: Checkout
@@ -41,32 +38,15 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      # Linux amd64: native libsecret
-      - name: Install libsecret (Linux amd64)
-        if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
+      - name: Install libsecret (Linux)
+        if: matrix.goos == 'linux'
         run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev
-
-      # Linux arm64: register arm64 arch first, then install cross toolchain + libsecret
-      - name: Install cross toolchain + libsecret (Linux arm64)
-        if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo dpkg --add-architecture arm64
-          sudo apt-get update
-          sudo apt-get install -y \
-            gcc-aarch64-linux-gnu \
-            libsecret-1-dev:arm64 \
-            --no-install-recommends
 
       - name: Build
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "1"
-          # Cross-compiler for Linux arm64
-          CC: ${{ matrix.goarch == 'arm64' && matrix.goos == 'linux' && 'aarch64-linux-gnu-gcc' || '' }}
-          PKG_CONFIG_PATH: ${{ matrix.goarch == 'arm64' && matrix.goos == 'linux' && '/usr/lib/aarch64-linux-gnu/pkgconfig' || '' }}
         run: |
           go build -ldflags="-s -w" -o envs-${{ matrix.goos }}-${{ matrix.goarch }} .
 
@@ -102,6 +82,5 @@ jobs:
             dist/envs-darwin-amd64
             dist/envs-darwin-arm64
             dist/envs-linux-amd64
-            dist/envs-linux-arm64
             dist/checksums.txt
           generate_release_notes: true
