@@ -1,0 +1,38 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, check if a similar request already exists in [open issues](https://github.com/julianofirme/envsecret/issues).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or pain point.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How you'd like it to work. Include example commands if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you've thought about.
+
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Security considerations
+      options:
+        - label: This feature does not expose secrets in plaintext (stdout, disk, logs)
+          required: false
