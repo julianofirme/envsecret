@@ -46,26 +46,18 @@ jobs:
         if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
         run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev
 
-      # Linux arm64: cross-compilation toolchain + arm64 libsecret
-      - name: Install libsecret + cross toolchain (Linux arm64)
+      # Linux arm64: register arm64 arch first, then install cross toolchain + libsecret
+      - name: Install cross toolchain + libsecret (Linux arm64)
         if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
+          sudo dpkg --add-architecture arm64
           sudo apt-get update
           sudo apt-get install -y \
             gcc-aarch64-linux-gnu \
             libsecret-1-dev:arm64 \
             --no-install-recommends
-        env:
-          DEBIAN_FRONTEND: noninteractive
-
-      - name: Add arm64 architecture to dpkg (Linux arm64)
-        if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
-        run: |
-          sudo dpkg --add-architecture arm64
-          sudo apt-get update
-          sudo apt-get install -y libsecret-1-dev:arm64 --no-install-recommends
-        env:
-          DEBIAN_FRONTEND: noninteractive
 
       - name: Build
         env:
